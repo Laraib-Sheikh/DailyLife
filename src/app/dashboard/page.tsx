@@ -1,10 +1,18 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import type { Note, Tag, NoteTags, Reminder } from "@prisma/client";
 import Link from "next/link";
 import { format, isToday, isTomorrow, isPast } from "date-fns";
 
-type NoteWithTags = Note & { tags: (NoteTags & { tag: Tag })[] };
+type TagType = { id: string; name: string; color: string };
+type NoteWithTags = {
+  id: string; title: string; content: string; color: string;
+  pinned: boolean; updatedAt: Date;
+  tags: { tag: TagType }[];
+};
+type ReminderType = {
+  id: string; title: string; dueDate: Date;
+  completed: boolean; priority: string;
+};
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -31,7 +39,7 @@ export default async function DashboardPage() {
     ]);
 
   const overdueCount = upcomingReminders.filter(
-    (r: Reminder) => isPast(new Date(r.dueDate)) && !isToday(new Date(r.dueDate))
+    (r: ReminderType) => isPast(new Date(r.dueDate)) && !isToday(new Date(r.dueDate))
   ).length;
 
   const hour = new Date().getHours();
@@ -198,7 +206,7 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {upcomingReminders.map((reminder: Reminder) => {
+              {upcomingReminders.map((reminder: ReminderType) => {
                 const { label, color } = getReminderLabel(new Date(reminder.dueDate));
                 return (
                   <Link
