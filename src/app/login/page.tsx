@@ -8,10 +8,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import toast from "react-hot-toast";
-import { Eye, EyeOff, LogIn, NotebookPen } from "lucide-react";
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.string().email("Invalid email"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -19,16 +18,14 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  });
+  } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
   const onSubmit = async (data: LoginFormData) => {
     setLoading(true);
@@ -38,111 +35,297 @@ export default function LoginPage() {
         password: data.password,
         redirect: false,
       });
-
       if (result?.error) {
-        toast.error("Invalid email or password");
+        toast.error("INVALID CREDENTIALS");
       } else {
-        toast.success("Welcome back!");
+        toast.success("SESSION INITIALIZED");
         router.push("/dashboard");
         router.refresh();
       }
     } catch {
-      toast.error("Something went wrong");
+      toast.error("SYSTEM ERROR");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+    <main
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#0b1326",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
       {/* Background blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-600/5 rounded-full blur-3xl" />
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
+        <div
+          style={{
+            position: "absolute",
+            top: "25%",
+            left: "25%",
+            width: "384px",
+            height: "384px",
+            backgroundColor: "#8083ff",
+            borderRadius: "50%",
+            filter: "blur(120px)",
+            opacity: 0.2,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: "25%",
+            right: "25%",
+            width: "500px",
+            height: "500px",
+            backgroundColor: "#ddb7ff",
+            borderRadius: "50%",
+            filter: "blur(150px)",
+            opacity: 0.15,
+          }}
+        />
       </div>
 
-      <div className="w-full max-w-md px-4 fade-in">
-        {/* Logo */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 glow">
-            <NotebookPen className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold gradient-text">DailyNote</h1>
-          <p className="text-slate-400 mt-1">Sign in to your notes</p>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 10,
+          width: "100%",
+          maxWidth: "440px",
+          padding: "0 16px",
+        }}
+        className="fade-in"
+      >
+        {/* Brand */}
+        <div style={{ textAlign: "center", marginBottom: "48px" }}>
+          <h1
+            style={{
+              fontFamily: "Space Grotesk",
+              fontWeight: 700,
+              fontSize: "48px",
+              letterSpacing: "-0.02em",
+              color: "#dae2fd",
+              lineHeight: 1,
+              marginBottom: "8px",
+            }}
+          >
+            Neon<span style={{ color: "#34D399" }}>Notes</span>
+          </h1>
+          <p
+            style={{
+              fontFamily: "JetBrains Mono",
+              fontSize: "12px",
+              fontWeight: 500,
+              letterSpacing: "0.1em",
+              color: "#c7c4d7",
+              textTransform: "uppercase",
+            }}
+          >
+            Secure Access
+          </p>
         </div>
 
         {/* Card */}
-        <div className="glass rounded-2xl p-8 shadow-2xl">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                Email address
+        <div
+          style={{
+            backgroundColor: "rgba(30,41,59,0.7)",
+            backdropFilter: "blur(20px)",
+            border: "2px solid #ffffff",
+            padding: "32px",
+            boxShadow: "8px 8px 0 0 #4edea3",
+            transition: "box-shadow 0.3s",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.boxShadow = "12px 12px 0 0 #D946EF";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.boxShadow = "8px 8px 0 0 #4edea3";
+          }}
+        >
+          <form onSubmit={handleSubmit(onSubmit)} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            {/* Email */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label
+                htmlFor="email"
+                style={{ fontFamily: "JetBrains Mono", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#dae2fd" }}
+              >
+                Email
               </label>
               <input
                 {...register("email")}
+                id="email"
                 type="email"
-                placeholder="you@example.com"
-                className="w-full px-4 py-3 bg-slate-800/60 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                placeholder="you@domain.com"
+                style={{
+                  width: "100%",
+                  background: "transparent",
+                  border: "none",
+                  borderBottom: errors.email ? "2px solid #ffb4ab" : "2px solid #ffffff",
+                  paddingBottom: "8px",
+                  color: "#dae2fd",
+                  fontFamily: "Inter",
+                  fontSize: "16px",
+                  outline: "none",
+                  transition: "border-color 0.15s",
+                }}
+                onFocus={(e) => {
+                  if (!errors.email) (e.target as HTMLElement).style.borderBottomColor = "#34D399";
+                }}
+                onBlur={(e) => {
+                  if (!errors.email) (e.target as HTMLElement).style.borderBottomColor = "#ffffff";
+                }}
               />
               {errors.email && (
-                <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>
+                <span style={{ fontFamily: "JetBrains Mono", fontSize: "10px", color: "#ffb4ab", letterSpacing: "0.05em" }}>
+                  {errors.email.message}
+                </span>
               )}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                Password
-              </label>
-              <div className="relative">
+            {/* Password */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <label
+                  htmlFor="password"
+                  style={{ fontFamily: "JetBrains Mono", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#dae2fd" }}
+                >
+                  Password
+                </label>
+              </div>
+              <div style={{ position: "relative" }}>
                 <input
                   {...register("password")}
-                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  type={showPwd ? "text" : "password"}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 bg-slate-800/60 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all pr-12"
+                  style={{
+                    width: "100%",
+                    background: "transparent",
+                    border: "none",
+                    borderBottom: errors.password ? "2px solid #ffb4ab" : "2px solid #ffffff",
+                    paddingBottom: "8px",
+                    paddingRight: "32px",
+                    color: "#dae2fd",
+                    fontFamily: "Inter",
+                    fontSize: "16px",
+                    outline: "none",
+                    transition: "border-color 0.15s",
+                  }}
+                  onFocus={(e) => {
+                    if (!errors.password) (e.target as HTMLElement).style.borderBottomColor = "#34D399";
+                  }}
+                  onBlur={(e) => {
+                    if (!errors.password) (e.target as HTMLElement).style.borderBottomColor = "#ffffff";
+                  }}
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+                  onClick={() => setShowPwd(!showPwd)}
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    top: "50%",
+                    transform: "translateY(-60%)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#908fa0",
+                    display: "flex",
+                  }}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+                    {showPwd ? "visibility_off" : "visibility"}
+                  </span>
                 </button>
               </div>
               {errors.password && (
-                <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>
+                <span style={{ fontFamily: "JetBrains Mono", fontSize: "10px", color: "#ffb4ab", letterSpacing: "0.05em" }}>
+                  {errors.password.message}
+                </span>
               )}
             </div>
 
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-500/25"
+              style={{
+                width: "100%",
+                backgroundColor: "#D946EF",
+                color: "#dae2fd",
+                fontFamily: "JetBrains Mono",
+                fontSize: "12px",
+                fontWeight: 500,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                padding: "16px",
+                border: "2px solid #ffffff",
+                boxShadow: "4px 4px 0 0 #4edea3",
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.7 : 1,
+                transition: "all 0.2s",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                marginTop: "8px",
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  (e.currentTarget as HTMLElement).style.transform = "translate(2px, 2px)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "2px 2px 0 0 #4edea3";
+                }
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = "translate(0, 0)";
+                (e.currentTarget as HTMLElement).style.boxShadow = "4px 4px 0 0 #4edea3";
+              }}
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span className="material-symbols-outlined" style={{ fontSize: "16px", animation: "spin 1s linear infinite" }}>
+                  progress_activity
+                </span>
               ) : (
-                <>
-                  <LogIn className="w-5 h-5" />
-                  Sign in
-                </>
+                <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>login</span>
               )}
+              {loading ? "INITIALIZING..." : "Initialize Session"}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-slate-400 text-sm">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/register"
-                className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
-              >
-                Create one
-              </Link>
-            </p>
+          {/* Divider */}
+          <div style={{ display: "flex", alignItems: "center", gap: "16px", margin: "24px 0" }}>
+            <div style={{ flex: 1, height: "2px", backgroundColor: "#2d3449" }} />
+            <span style={{ fontFamily: "JetBrains Mono", fontSize: "11px", color: "#464554", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+              Or
+            </span>
+            <div style={{ flex: 1, height: "2px", backgroundColor: "#2d3449" }} />
           </div>
+
+          {/* Register link */}
+          <p style={{ textAlign: "center", fontFamily: "JetBrains Mono", fontSize: "11px", color: "#908fa0", letterSpacing: "0.05em" }}>
+            No account?{" "}
+            <Link
+              href="/register"
+              style={{ color: "#34D399", textDecoration: "none", transition: "color 0.15s" }}
+            >
+              REGISTER NOW →
+            </Link>
+          </p>
         </div>
       </div>
-    </div>
+
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        input::placeholder { color: #464554; }
+      `}</style>
+    </main>
   );
 }

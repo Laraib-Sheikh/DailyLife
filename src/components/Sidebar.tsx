@@ -3,16 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import {
-  LayoutDashboard,
-  NotebookPen,
-  Bell,
-  Tag,
-  LogOut,
-  Settings,
-  ChevronRight,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface SidebarProps {
   user: {
@@ -22,10 +12,10 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/notes", label: "My Notes", icon: NotebookPen },
-  { href: "/dashboard/reminders", label: "Reminders", icon: Bell },
-  { href: "/dashboard/tags", label: "Tags", icon: Tag },
+  { href: "/dashboard", path: "dashboard", label: "All Notes", icon: "description" },
+  { href: "/dashboard/reminders", path: "reminders", label: "Reminders", icon: "notifications_active" },
+  { href: "/dashboard/tags", path: "tags", label: "Tags", icon: "sell" },
+  { href: "/dashboard/settings", path: "settings", label: "Settings", icon: "settings" },
 ];
 
 export default function Sidebar({ user }: SidebarProps) {
@@ -36,73 +26,157 @@ export default function Sidebar({ user }: SidebarProps) {
     : user.email?.[0].toUpperCase() ?? "U";
 
   return (
-    <aside className="hidden md:flex flex-col w-64 h-screen glass border-r border-slate-700/50 flex-shrink-0">
-      {/* Logo */}
-      <div className="p-6 border-b border-slate-700/50">
-        <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
-            <NotebookPen className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-xl font-bold gradient-text">DailyNote</span>
-        </Link>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
-        {navItems.map(({ href, label, icon: Icon }) => {
+    <aside
+      className="hidden md:flex fixed left-0 top-0 h-full flex-col"
+      style={{
+        width: "288px",
+        backgroundColor: "#131b2e",
+        borderRight: "2px solid #ffffff",
+        zIndex: 50,
+        paddingTop: "80px",
+      }}
+    >
+      <nav className="flex-1 px-4 space-y-2 pt-6">
+        {navItems.map(({ href, path, label, icon }) => {
           const isActive =
-            href === "/dashboard" ? pathname === href : pathname.startsWith(href);
+            path === "dashboard"
+              ? pathname === "/dashboard"
+              : pathname.startsWith(href);
+
           return (
             <Link
               key={href}
               href={href}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group",
-                isActive
-                  ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/30"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
-              )}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                padding: "16px 24px",
+                border: "2px solid transparent",
+                fontFamily: "JetBrains Mono, monospace",
+                fontSize: "12px",
+                fontWeight: 500,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                textDecoration: "none",
+                transition: "all 0.15s ease",
+                ...(isActive
+                  ? {
+                      backgroundColor: "#D946EF",
+                      color: "#ffffff",
+                      boxShadow: "4px 4px 0px 0px #34D399",
+                    }
+                  : {
+                      color: "#c7c4d7",
+                    }),
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLElement).style.borderColor = "#ffffff";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLElement).style.borderColor = "transparent";
+                }
+              }}
             >
-              <Icon
-                className={cn(
-                  "w-5 h-5 flex-shrink-0 transition-colors",
-                  isActive ? "text-indigo-400" : "text-slate-500 group-hover:text-slate-300"
-                )}
-              />
-              <span className="flex-1">{label}</span>
-              {isActive && (
-                <ChevronRight className="w-4 h-4 text-indigo-400/60" />
-              )}
+              <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>
+                {icon}
+              </span>
+              {label}
             </Link>
           );
         })}
       </nav>
 
       {/* User Section */}
-      <div className="p-4 border-t border-slate-700/50 space-y-2">
-        <Link
-          href="/dashboard/settings"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all group"
+      <div
+        style={{
+          padding: "16px",
+          borderTop: "2px solid rgba(255,255,255,0.1)",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            padding: "12px",
+            backgroundColor: "rgba(30,41,59,0.5)",
+            border: "2px solid rgba(255,255,255,0.15)",
+          }}
         >
-          <Settings className="w-5 h-5 text-slate-500 group-hover:text-slate-300 flex-shrink-0" />
-          Settings
-        </Link>
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/40">
-          <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+          <div
+            style={{
+              width: "36px",
+              height: "36px",
+              backgroundColor: "#D946EF",
+              border: "2px solid #ffffff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              fontFamily: "JetBrains Mono",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "#ffffff",
+            }}
+          >
             {initials}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-200 truncate">
-              {user.name || "User"}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p
+              style={{
+                fontFamily: "JetBrains Mono",
+                fontSize: "11px",
+                fontWeight: 500,
+                color: "#dae2fd",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                letterSpacing: "0.05em",
+              }}
+            >
+              {user.name || "USER"}
             </p>
-            <p className="text-xs text-slate-500 truncate">{user.email}</p>
+            <p
+              style={{
+                fontFamily: "JetBrains Mono",
+                fontSize: "10px",
+                color: "#908fa0",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {user.email}
+            </p>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="text-slate-500 hover:text-red-400 transition-colors flex-shrink-0"
             title="Sign out"
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#908fa0",
+              display: "flex",
+              alignItems: "center",
+              padding: "4px",
+              transition: "color 0.15s",
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.color = "#ffb4ab";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.color = "#908fa0";
+            }}
           >
-            <LogOut className="w-4 h-4" />
+            <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+              logout
+            </span>
           </button>
         </div>
       </div>

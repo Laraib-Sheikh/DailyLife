@@ -4,16 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import {
-  LayoutDashboard,
-  NotebookPen,
-  Bell,
-  Tag,
-  LogOut,
-  Menu,
-  X,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface MobileNavProps {
   user: {
@@ -23,10 +13,10 @@ interface MobileNavProps {
 }
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/notes", label: "My Notes", icon: NotebookPen },
-  { href: "/dashboard/reminders", label: "Reminders", icon: Bell },
-  { href: "/dashboard/tags", label: "Tags", icon: Tag },
+  { href: "/dashboard", path: "dashboard", label: "All Notes", icon: "description" },
+  { href: "/dashboard/reminders", path: "reminders", label: "Reminders", icon: "notifications_active" },
+  { href: "/dashboard/tags", path: "tags", label: "Tags", icon: "sell" },
+  { href: "/dashboard/settings", path: "settings", label: "Settings", icon: "settings" },
 ];
 
 export default function MobileNav({ user }: MobileNavProps) {
@@ -39,83 +29,191 @@ export default function MobileNav({ user }: MobileNavProps) {
 
   return (
     <>
-      {/* Top bar */}
-      <header className="md:hidden flex items-center justify-between px-4 py-3 glass border-b border-slate-700/50">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-            <NotebookPen className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-bold gradient-text">DailyNote</span>
-        </Link>
+      {/* Top Header */}
+      <header
+        className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between"
+        style={{
+          height: "64px",
+          padding: "0 16px",
+          background: "rgba(30,41,59,0.7)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderBottom: "2px solid #ffffff",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span
+            className="material-symbols-outlined"
+            style={{ color: "#D946EF", fontSize: "24px" }}
+          >
+            note_stack
+          </span>
+          <span
+            style={{
+              fontFamily: "Space Grotesk",
+              fontWeight: 700,
+              fontSize: "18px",
+              letterSpacing: "-0.02em",
+              color: "#dae2fd",
+            }}
+          >
+            NEON<span style={{ color: "#34D399" }}>NOTES</span>
+          </span>
+        </div>
         <button
           onClick={() => setOpen(true)}
-          className="text-slate-400 hover:text-white transition-colors"
+          style={{
+            background: "none",
+            border: "2px solid #ffffff",
+            padding: "6px",
+            cursor: "pointer",
+            color: "#dae2fd",
+            display: "flex",
+          }}
         >
-          <Menu className="w-6 h-6" />
+          <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>
+            menu
+          </span>
         </button>
       </header>
 
       {/* Drawer */}
       {open && (
-        <div className="md:hidden fixed inset-0 z-50 flex">
+        <div
+          className="md:hidden fixed inset-0 z-50 flex"
+          onClick={() => setOpen(false)}
+          style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
+        >
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setOpen(false)}
-          />
-          <div className="relative w-72 glass h-full flex flex-col shadow-2xl">
-            <div className="flex items-center justify-between p-5 border-b border-slate-700/50">
-              <span className="text-lg font-bold gradient-text">DailyNote</span>
+            style={{
+              width: "288px",
+              height: "100%",
+              backgroundColor: "#131b2e",
+              borderRight: "2px solid #ffffff",
+              display: "flex",
+              flexDirection: "column",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "20px 16px",
+                borderBottom: "2px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "Space Grotesk",
+                  fontWeight: 700,
+                  fontSize: "18px",
+                  color: "#dae2fd",
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                NEON<span style={{ color: "#34D399" }}>NOTES</span>
+              </span>
               <button
                 onClick={() => setOpen(false)}
-                className="text-slate-400 hover:text-white transition-colors"
+                style={{
+                  background: "none",
+                  border: "2px solid rgba(255,255,255,0.3)",
+                  padding: "4px",
+                  cursor: "pointer",
+                  color: "#dae2fd",
+                  display: "flex",
+                }}
               >
-                <X className="w-5 h-5" />
+                <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+                  close
+                </span>
               </button>
             </div>
 
-            <nav className="flex-1 p-4 space-y-1">
-              {navItems.map(({ href, label, icon: Icon }) => {
+            <nav style={{ flex: 1, padding: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
+              {navItems.map(({ href, path, label, icon }) => {
                 const isActive =
-                  href === "/dashboard"
-                    ? pathname === href
+                  path === "dashboard"
+                    ? pathname === "/dashboard"
                     : pathname.startsWith(href);
                 return (
                   <Link
                     key={href}
                     href={href}
                     onClick={() => setOpen(false)}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
-                      isActive
-                        ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/30"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
-                    )}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      padding: "14px 20px",
+                      border: "2px solid transparent",
+                      fontFamily: "JetBrains Mono",
+                      fontSize: "12px",
+                      fontWeight: 500,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      textDecoration: "none",
+                      ...(isActive
+                        ? { backgroundColor: "#D946EF", color: "#fff", boxShadow: "4px 4px 0 0 #34D399" }
+                        : { color: "#c7c4d7", borderColor: "transparent" }),
+                    }}
                   >
-                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>
+                      {icon}
+                    </span>
                     {label}
                   </Link>
                 );
               })}
             </nav>
 
-            <div className="p-4 border-t border-slate-700/50">
-              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/40 mb-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-xs font-bold">
+            <div style={{ padding: "16px", borderTop: "2px solid rgba(255,255,255,0.1)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+                <div
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    backgroundColor: "#D946EF",
+                    border: "2px solid #fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: "JetBrains Mono",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    color: "#fff",
+                  }}
+                >
                   {initials}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-200 truncate">
-                    {user.name || "User"}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontFamily: "JetBrains Mono", fontSize: "11px", color: "#dae2fd", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {user.name || "USER"}
                   </p>
-                  <p className="text-xs text-slate-500 truncate">{user.email}</p>
                 </div>
               </div>
               <button
                 onClick={() => signOut({ callbackUrl: "/login" })}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition-all"
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "12px",
+                  border: "2px solid rgba(255,180,171,0.3)",
+                  backgroundColor: "transparent",
+                  color: "#ffb4ab",
+                  fontFamily: "JetBrains Mono",
+                  fontSize: "11px",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                }}
               >
-                <LogOut className="w-5 h-5" />
-                Sign out
+                <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>logout</span>
+                Sign Out
               </button>
             </div>
           </div>
