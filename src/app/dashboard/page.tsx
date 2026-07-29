@@ -28,7 +28,7 @@ export default async function DashboardPage() {
     ]);
 
   const overdueCount = upcomingReminders.filter(
-    (r) => isPast(new Date(r.dueDate)) && !isToday(new Date(r.dueDate))
+    (r: { dueDate: Date }) => isPast(new Date(r.dueDate)) && !isToday(new Date(r.dueDate))
   ).length;
 
   const hour = new Date().getHours();
