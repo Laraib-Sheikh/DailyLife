@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  notes     Note[]
+  reminders Reminder[]
+  tags      Tag[]
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  color     String   @default("#ffffff")
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tags NoteTags[]
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String
+  color String @default("#6366f1")
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  notes NoteTags[]
+
+  @@unique([name, userId])
+}
+
+model NoteTags {
+  noteId String
+  tagId  String
+
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([noteId, tagId])
+}
+
+model Reminder {
+  id          String         @id @default(cuid())
+  title       String
+  description String?        @db.Text
+  dueDate     DateTime
+  completed   Boolean        @default(false)
+  priority    ReminderPriority @default(MEDIUM)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum ReminderPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
