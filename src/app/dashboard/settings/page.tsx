@@ -2,102 +2,137 @@
 
 import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
-import { Settings, LogOut, User, Shield } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
 
+  const initials = session?.user?.name
+    ? session.user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    : session?.user?.email?.[0].toUpperCase() ?? "U";
+
   const handleSignOut = async () => {
     setLoading(true);
     await signOut({ callbackUrl: "/login" });
   };
 
+  const cardBase: React.CSSProperties = {
+    backgroundColor: "rgba(30,41,59,0.7)",
+    backdropFilter: "blur(20px)",
+    border: "2px solid #ffffff",
+    padding: "24px",
+  };
+
   return (
-    <div className="max-w-2xl mx-auto fade-in space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Settings className="w-6 h-6 text-slate-400" />
+    <div className="fade-in" style={{ maxWidth: "720px", margin: "0 auto" }}>
+      {/* Header */}
+      <div style={{ borderBottom: "2px solid #ffffff", paddingBottom: "16px", marginBottom: "32px" }}>
+        <h1 style={{ fontFamily: "Space Grotesk", fontWeight: 700, fontSize: "clamp(32px,5vw,48px)", letterSpacing: "-0.02em", color: "#dae2fd", textTransform: "uppercase" }}>
           Settings
         </h1>
-        <p className="text-slate-400 text-sm mt-0.5">Manage your account</p>
+        <p style={{ fontFamily: "Inter", fontSize: "16px", color: "#908fa0", marginTop: "4px" }}>
+          Manage your account
+        </p>
       </div>
 
-      {/* Profile Card */}
-      <div className="glass rounded-2xl p-6">
-        <h2 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
-          <User className="w-5 h-5 text-indigo-400" />
-          Profile
-        </h2>
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
-            {session?.user?.name
-              ? session.user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
-              : session?.user?.email?.[0].toUpperCase()}
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        {/* Profile */}
+        <div style={cardBase}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: "2px solid rgba(255,255,255,0.1)", paddingBottom: "16px", marginBottom: "20px" }}>
+            <span className="material-symbols-outlined" style={{ color: "#D946EF", fontSize: "18px" }}>person</span>
+            <h2 style={{ fontFamily: "JetBrains Mono", fontSize: "12px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "#dae2fd" }}>Profile</h2>
           </div>
-          <div>
-            <p className="font-semibold text-white text-lg">
-              {session?.user?.name ?? "User"}
-            </p>
-            <p className="text-slate-400 text-sm">{session?.user?.email}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Security Card */}
-      <div className="glass rounded-2xl p-6">
-        <h2 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
-          <Shield className="w-5 h-5 text-emerald-400" />
-          Account
-        </h2>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between p-4 bg-slate-800/40 rounded-xl">
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <div
+              style={{
+                width: "64px", height: "64px",
+                backgroundColor: "#D946EF",
+                border: "2px solid #ffffff",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: "JetBrains Mono", fontSize: "20px", fontWeight: 700, color: "#ffffff",
+                flexShrink: 0,
+                boxShadow: "4px 4px 0 0 #34D399",
+              }}
+            >
+              {initials}
+            </div>
             <div>
-              <p className="text-sm font-medium text-white">Session</p>
-              <p className="text-xs text-slate-400 mt-0.5">
-                You are currently signed in
+              <p style={{ fontFamily: "Space Grotesk", fontWeight: 600, fontSize: "20px", color: "#dae2fd" }}>
+                {session?.user?.name ?? "User"}
+              </p>
+              <p style={{ fontFamily: "JetBrains Mono", fontSize: "12px", color: "#908fa0", marginTop: "4px", letterSpacing: "0.05em" }}>
+                {session?.user?.email}
               </p>
             </div>
-            <span className="text-xs px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20">
-              Active
-            </span>
           </div>
+        </div>
 
-          <button
-            onClick={() => toast("Password change coming soon!", { icon: "🚧" })}
-            className="w-full flex items-center justify-between p-4 bg-slate-800/40 hover:bg-slate-800/60 rounded-xl transition-all text-left"
-          >
-            <div>
-              <p className="text-sm font-medium text-white">Change Password</p>
-              <p className="text-xs text-slate-400 mt-0.5">Update your password</p>
+        {/* Account */}
+        <div style={cardBase}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: "2px solid rgba(255,255,255,0.1)", paddingBottom: "16px", marginBottom: "20px" }}>
+            <span className="material-symbols-outlined" style={{ color: "#34D399", fontSize: "18px" }}>shield</span>
+            <h2 style={{ fontFamily: "JetBrains Mono", fontSize: "12px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "#dae2fd" }}>Account</h2>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", backgroundColor: "rgba(6,14,32,0.5)", border: "2px solid rgba(255,255,255,0.1)" }}>
+              <div>
+                <p style={{ fontFamily: "JetBrains Mono", fontSize: "12px", color: "#dae2fd", letterSpacing: "0.05em" }}>Session Status</p>
+                <p style={{ fontFamily: "Inter", fontSize: "13px", color: "#908fa0", marginTop: "2px" }}>You are currently signed in</p>
+              </div>
+              <span style={{ fontFamily: "JetBrains Mono", fontSize: "10px", padding: "4px 10px", backgroundColor: "rgba(52,211,153,0.1)", border: "2px solid #34D399", color: "#34D399", letterSpacing: "0.08em" }}>
+                ACTIVE
+              </span>
             </div>
-            <span className="text-slate-500 text-sm">→</span>
+            <button
+              onClick={() => toast("Password change coming soon!", { icon: "🚧" })}
+              style={{
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                padding: "16px", backgroundColor: "rgba(6,14,32,0.5)",
+                border: "2px solid rgba(255,255,255,0.1)", cursor: "pointer",
+                transition: "all 0.15s", textAlign: "left",
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#c0c1ff"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.1)"; }}
+            >
+              <div>
+                <p style={{ fontFamily: "JetBrains Mono", fontSize: "12px", color: "#dae2fd", letterSpacing: "0.05em" }}>Change Password</p>
+                <p style={{ fontFamily: "Inter", fontSize: "13px", color: "#908fa0", marginTop: "2px" }}>Update your login credentials</p>
+              </div>
+              <span className="material-symbols-outlined" style={{ fontSize: "18px", color: "#908fa0" }}>arrow_forward</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Sign Out */}
+        <div style={{ ...cardBase, borderColor: "rgba(255,180,171,0.3)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: "2px solid rgba(255,180,171,0.2)", paddingBottom: "16px", marginBottom: "20px" }}>
+            <span className="material-symbols-outlined" style={{ color: "#ffb4ab", fontSize: "18px" }}>logout</span>
+            <h2 style={{ fontFamily: "JetBrains Mono", fontSize: "12px", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "#ffb4ab" }}>Danger Zone</h2>
+          </div>
+          <p style={{ fontFamily: "Inter", fontSize: "14px", color: "#908fa0", marginBottom: "16px" }}>
+            You&apos;ll be redirected to the login page after signing out.
+          </p>
+          <button
+            onClick={handleSignOut}
+            disabled={loading}
+            style={{
+              display: "flex", alignItems: "center", gap: "8px",
+              padding: "12px 24px", backgroundColor: "rgba(255,180,171,0.1)",
+              border: "2px solid rgba(255,180,171,0.4)", color: "#ffb4ab",
+              fontFamily: "JetBrains Mono", fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase",
+              cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1, transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => { if (!loading) { (e.currentTarget as HTMLElement).style.boxShadow = "4px 4px 0 0 #ffb4ab"; (e.currentTarget as HTMLElement).style.transform = "translate(-2px,-2px)"; } }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "none"; (e.currentTarget as HTMLElement).style.transform = "translate(0,0)"; }}
+          >
+            {loading
+              ? <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>progress_activity</span>
+              : <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>logout</span>
+            }
+            {loading ? "SIGNING OUT..." : "Sign Out"}
           </button>
         </div>
-      </div>
-
-      {/* Danger Zone */}
-      <div className="glass rounded-2xl p-6 border border-red-500/10">
-        <h2 className="text-base font-semibold text-red-400 mb-4 flex items-center gap-2">
-          <LogOut className="w-5 h-5" />
-          Sign Out
-        </h2>
-        <p className="text-slate-400 text-sm mb-4">
-          You&apos;ll be redirected to the login page.
-        </p>
-        <button
-          onClick={handleSignOut}
-          disabled={loading}
-          className="flex items-center gap-2 px-5 py-2.5 bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-400 text-sm font-medium rounded-xl transition-all disabled:opacity-60"
-        >
-          {loading ? (
-            <div className="w-4 h-4 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
-          ) : (
-            <LogOut className="w-4 h-4" />
-          )}
-          Sign out
-        </button>
       </div>
     </div>
   );
