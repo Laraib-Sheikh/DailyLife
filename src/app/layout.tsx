@@ -6,6 +6,10 @@ import Providers from "@/components/Providers";
 export const metadata: Metadata = {
   title: "NeonNotes — Your Daily Notes",
   description: "Write your daily notes, set reminders, and stay organized.",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({
