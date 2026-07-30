@@ -1,13 +1,14 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 
-// PrismaClient is imported from the generated client directly to avoid
-// Prisma 7's bundler module resolution issue with the @prisma/client re-export chain.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { PrismaClient } = require(".prisma/client") as typeof import(".prisma/client");
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore — Prisma 7 named exports don't resolve with moduleResolution:"bundler"
+// but the runtime import works fine since @prisma/client does export PrismaClient
+import { PrismaClient } from "@prisma/client";
 
-type PrismaClientInstance = ReturnType<typeof createPrismaClient>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type PrismaInstance = any;
 
-function createPrismaClient() {
+function createPrismaClient(): PrismaInstance {
   const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL!,
   });
@@ -15,9 +16,10 @@ function createPrismaClient() {
 }
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClientInstance | undefined;
+  prisma: PrismaInstance | undefined;
 };
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+export const prisma: PrismaInstance =
+  globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
